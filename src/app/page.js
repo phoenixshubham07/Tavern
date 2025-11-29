@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, Clock, Users, Trophy, Zap, Shield, Gamepad2, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import LazySpline from "@/components/LazySpline";
+import Spline from '@splinetool/react-spline';
 
 gsap.registerPlugin(ScrollTrigger);
 

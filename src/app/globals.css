@@ -75,3 +75,104 @@ html.lenis {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
+/* --- Text Effects --- */
+.animate-spin-slow {
+    animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- The Smooth Zoom Cursor --- */
+#cursor-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform, width, height;
+    mix-blend-mode: exclusion;
+}
+
+.cursor-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Cursor styling */
+.cursor-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #ffffff; 
+    box-shadow: 0 0 2px rgba(255,255,255,0.5);
+    transition: all 0.2s ease;
+}
+
+.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+.cursor-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+/* Hide custom cursor when hovering over inputs */
+body:has(input:hover) #cursor-root,
+body:has(button:hover) #cursor-root {
+    opacity: 0; 
+}
+
+/* --- TAVERN GLITCH STYLES --- */
+.tavern-wrapper {
+    position: relative;
+    display: inline-block;
+    padding: 20px 50px;
+}
+
+.glitch-text-base {
+    font-size: 10vw; 
+    font-weight: 900;
+    color: #FFFFFF; 
+    text-transform: uppercase;
+    letter-spacing: -0.5vw;
+    line-height: 1;
+    opacity: 0; 
+    user-select: none;
+    margin: 0;
+}
+
+.glitch-slice {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 10vw; 
+    font-weight: 900;
+    color: #FFFFFF; 
+    text-transform: uppercase;
+    letter-spacing: -0.5vw;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    will-change: transform, filter;
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

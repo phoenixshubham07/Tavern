@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, ArrowRight, Cpu, Disc, Activity, Type } from 'lucide-react';
+import { signIn } from "next-auth/react";
 
 // ==========================================
 // 1. TAVERN GLITCH COMPONENT
@@ -58,7 +59,7 @@ const TavernGlitch = () => {
 
                     if (distY < HOVER_RADIUS) {
                         const intensity = 1 - (distY / HOVER_RADIUS);
-                        const jitter = (Math.random() - 0.5) * 2; 
+                        const jitter = (Math.random() - 0.5) * 2;
                         slice.targetOffsetX = jitter * FORCE * intensity;
                         if (intensity > 0.4) {
                             slice.el.style.filter = `blur(${intensity * 3}px)`;
@@ -196,139 +197,52 @@ const CountUp = ({ to, duration = 2000 }) => {
 // ==========================================
 export default function LoginPage() {
     const [intro, setIntro] = useState(false);
-    
+
     // --- INPUT STATE ---
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    
+
     const [isFocused, setIsFocused] = useState(false);
     const [isSignIn, setIsSignIn] = useState(true);
 
     useEffect(() => { setTimeout(() => setIntro(true), 500); }, []);
 
+    const handleCredentialsLogin = async (e) => {
+        e.preventDefault();
+        // For now, using the mock credentials provider
+        await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: "/" // Redirect to home on success
+        });
+    };
+
+    const handleGoogleLogin = async () => {
+        await signIn("google", { callbackUrl: "/" });
+    };
+
     return (
         <div className="relative min-h-screen w-full overflow-hidden bg-black font-mono cursor-none">
-            <style jsx global>{`
-                /* --- Text Effects --- */
-                .animate-spin-slow {
-                    animation: spin 8s linear infinite;
-                }
 
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
 
-                /* --- The Smooth Zoom Cursor --- */
-                #cursor-root {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    pointer-events: none;
-                    z-index: 9999;
-                    will-change: transform, width, height;
-                    mix-blend-mode: exclusion;
-                }
-
-                .cursor-box {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                }
-
-                /* Cursor styling */
-                .cursor-corner {
-                    position: absolute;
-                    width: 10px;
-                    height: 10px;
-                    border: 2px solid #ffffff; 
-                    box-shadow: 0 0 2px rgba(255,255,255,0.5);
-                    transition: all 0.2s ease;
-                }
-
-                .tl { top: 0; left: 0; border-right: none; border-bottom: none; }
-                .tr { top: 0; right: 0; border-left: none; border-bottom: none; }
-                .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
-                .br { bottom: 0; right: 0; border-left: none; border-top: none; }
-
-                .cursor-dot {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 4px;
-                    height: 4px;
-                    background: #ffffff;
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    opacity: 1;
-                    transition: opacity 0.2s;
-                }
-
-                /* Hide custom cursor when hovering over inputs */
-                body:has(input:hover) #cursor-root,
-                body:has(button:hover) #cursor-root {
-                    opacity: 0; 
-                }
-
-                /* --- TAVERN GLITCH STYLES --- */
-                .tavern-wrapper {
-                    position: relative;
-                    display: inline-block;
-                    padding: 20px 50px;
-                }
-
-                .glitch-text-base {
-                    font-size: 10vw; 
-                    font-weight: 900;
-                    color: #FFFFFF; 
-                    text-transform: uppercase;
-                    letter-spacing: -0.5vw;
-                    line-height: 1;
-                    opacity: 0; 
-                    user-select: none;
-                    margin: 0;
-                }
-
-                .glitch-slice {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    font-size: 10vw; 
-                    font-weight: 900;
-                    color: #FFFFFF; 
-                    text-transform: uppercase;
-                    letter-spacing: -0.5vw;
-                    line-height: 1;
-                    white-space: nowrap;
-                    pointer-events: none;
-                    will-change: transform, filter;
-                    opacity: 1;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-            `}</style>
-            
             <MagneticCursor />
 
             <div className="relative z-40 flex w-full h-screen">
-                
+
                 {/* LEFT SIDE: Black Background */}
                 <div className="w-1/2 h-full relative flex items-center justify-center bg-black">
-                     <TavernGlitch />
+                    <TavernGlitch />
                 </div>
 
                 {/* RIGHT SIDE: White Background, Rounded Edge */}
                 <div className="w-1/2 h-full flex flex-col justify-center items-center relative bg-white text-black rounded-l-[20px] overflow-hidden">
-                    
+
                     <div className={`w-full max-w-md p-8 transition-all duration-1000 delay-200 ${intro ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20 pointer-events-none'}`}>
-                        
+
                         {/* CARD: Black Background, White Text (High Contrast) */}
                         <div className="space-y-8 rounded-xl border border-black/10 p-8 shadow-2xl shadow-black/30 bg-black text-white">
-                            
+
                             {/* Sign In / Sign Up Toggle */}
                             <div className="flex gap-6 cursor-target">
                                 <button onClick={() => setIsSignIn(true)} className={`text-sm font-bold uppercase tracking-wider pb-2 border-b-2 transition-all cursor-pointer ${isSignIn ? 'border-white text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
@@ -349,8 +263,8 @@ export default function LoginPage() {
                                 </h2>
                             </div>
 
-                            <form onSubmit={(e) => e.preventDefault()} className="space-y-6 text-left">
-                                
+                            <form onSubmit={handleCredentialsLogin} className="space-y-6 text-left">
+
                                 {/* NAME INPUT (Only shows in Sign Up mode) */}
                                 {!isSignIn && (
                                     <div className="group relative">
@@ -358,9 +272,9 @@ export default function LoginPage() {
                                             <Type className="text-gray-400 mr-4" size={20} />
                                             <div className="flex-1">
                                                 <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Full Name</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={name} 
+                                                <input
+                                                    type="text"
+                                                    value={name}
                                                     onChange={e => setName(e.target.value)}
                                                     onFocus={() => setIsFocused(true)}
                                                     className="w-full bg-transparent text-white outline-none font-bold tracking-wide placeholder-gray-600 cursor-text caret-white"
@@ -377,9 +291,9 @@ export default function LoginPage() {
                                         <User className="text-gray-400 mr-4" size={20} />
                                         <div className="flex-1">
                                             <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Identity</label>
-                                            <input 
-                                                type="text" 
-                                                value={email} 
+                                            <input
+                                                type="text"
+                                                value={email}
                                                 onChange={e => setEmail(e.target.value)}
                                                 onFocus={() => setIsFocused(true)}
                                                 className="w-full bg-transparent text-white outline-none font-bold tracking-wide placeholder-gray-600 cursor-text caret-white"
@@ -395,8 +309,8 @@ export default function LoginPage() {
                                         <Lock className="text-gray-400 mr-4" size={20} />
                                         <div className="flex-1">
                                             <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Key</label>
-                                            <input 
-                                                type="password" 
+                                            <input
+                                                type="password"
                                                 value={password}
                                                 onChange={e => setPassword(e.target.value)}
                                                 onFocus={() => setIsFocused(true)}
@@ -408,19 +322,19 @@ export default function LoginPage() {
                                 </div>
 
                                 {/* Buttons */}
-                                <button className="cursor-pointer group relative w-full h-14 bg-white text-black font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all duration-300 overflow-hidden">
-                                     <span className="relative flex items-center justify-center gap-3">
+                                <button type="submit" className="cursor-pointer group relative w-full h-14 bg-white text-black font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all duration-300 overflow-hidden">
+                                    <span className="relative flex items-center justify-center gap-3">
                                         {isSignIn ? 'Connect' : 'Register'} <ArrowRight size={18} />
                                     </span>
                                 </button>
-                                
-                                <button className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
+
+                                <button type="button" onClick={handleGoogleLogin} className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
                                     <span className="relative flex items-center justify-center gap-2">
-                                         Google Auth
+                                        Google Auth
                                     </span>
                                 </button>
                             </form>
-                            
+
                             {/* Footer */}
                             <div className="mt-8 flex justify-between items-end border-t border-white/10 pt-4 opacity-50">
                                 <div className="text-[10px] text-gray-400 font-mono space-y-1">
@@ -439,3 +353,4 @@ export default function LoginPage() {
         </div>
     );
 }
+

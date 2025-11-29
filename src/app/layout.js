@@ -1,8 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/Navbar";
+import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import SmoothScroll from "../components/SmoothScroll";
+import { createClient } from "@/utils/supabase/server";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -11,16 +12,19 @@ export const metadata = {
   description: "A premium platform for sharing notes, tracking study time, and version controlling your handwritten ideas with InkFlow.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="en" className="bg-premium-black">
       <body className={`${inter.variable} font-sans antialiased text-white selection:bg-accent-blue selection:text-navy-blue`}>
         <SmoothScroll>
-          <Navbar />
-          <main className="min-h-screen pt-24">
+          <Navigation user={user} />
+          <main className={`min-h-screen pt-24 ${user ? 'pl-24' : ''} transition-all duration-300`}>
             {children}
           </main>
-          <Footer />
+          {!user && <Footer />}
         </SmoothScroll>
       </body>
     </html>

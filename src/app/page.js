@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, Clock, Users, Trophy, Zap, Shield, Gamepad2, ChevronDown } from "lucide-react";
@@ -44,7 +44,11 @@ const bottomFeatures = [
   }
 ];
 
+import { createClient } from "@/utils/supabase/client";
+
 export default function Home() {
+  const [username, setUsername] = useState(null);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
   const heroRef = useRef(null);
   const textRef = useRef(null);
@@ -52,19 +56,35 @@ export default function Home() {
   const ctaRef = useRef(null);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('username').eq('id', user.id).single();
+        if (data?.username) {
+          setUsername(data.username);
+        }
+      }
+      setLoading(false);
+    };
+    checkUser();
+  }, []);
+
+  useEffect(() => {
+    if (loading || username) return; // Don't run animations if loading or logged in
     const ctx = gsap.context(() => {
       // Hero Text Stagger
       const tl = gsap.timeline();
       tl.fromTo(
         ".hero-text-item",
         { y: 100, opacity: 0, rotateX: -45 },
-        { 
-          y: 0, 
-          opacity: 1, 
-          rotateX: 0, 
-          duration: 1.2, 
-          stagger: 0.15, 
-          ease: "power4.out" 
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1.2,
+          stagger: 0.15,
+          ease: "power4.out"
         }
       );
 
@@ -117,7 +137,18 @@ export default function Home() {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, username]);
+
+  if (loading) return <div className="bg-black h-screen w-full flex items-center justify-center text-white font-mono">LOADING...</div>;
+
+  if (username) {
+    return (
+      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono space-y-4">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse">HELLO, {username.toUpperCase()}</h1>
+        <p className="text-gray-400">WELCOME TO THE TAVERN</p>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="flex flex-col items-center justify-center w-full overflow-hidden bg-premium-black">
@@ -128,12 +159,12 @@ export default function Home() {
       >
         {/* Spline Background */}
         <div className="absolute inset-0 z-0 mt-0">
-           <LazySpline 
-             scene="https://prod.spline.design/hcOwDIXpJJR-bgeE/scene.splinecode" 
-             className="w-full h-full"
-           />
+          <LazySpline
+            scene="https://prod.spline.design/hcOwDIXpJJR-bgeE/scene.splinecode"
+            className="w-full h-full"
+          />
         </div>
-        
+
         {/* Overlay to ensure text readability */}
         <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none" />
 
@@ -141,16 +172,16 @@ export default function Home() {
           <div className="hero-text-item inline-block px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-4 pointer-events-auto">
             <span className="text-accent-blue text-sm font-medium tracking-wide uppercase">v2.0 is Live</span>
           </div>
-          
+
           <h1 className="hero-text-item text-7xl md:text-9xl font-bold tracking-tighter text-white leading-[0.9]">
             Master Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">Knowledge.</span>
           </h1>
-          
+
           <p className="hero-text-item text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
             The premium platform for collaborative learning. Share notes, track progress, and compete with friends in a stunning environment.
           </p>
-          
+
           <div className="hero-text-item flex items-center justify-center gap-6 pt-8 pointer-events-auto">
             <Link
               href="/login"
@@ -170,8 +201,8 @@ export default function Home() {
         </div>
 
         <div className="scroll-indicator absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 z-10">
-            <span className="text-xs uppercase tracking-widest">Scroll</span>
-            <ChevronDown size={20} />
+          <span className="text-xs uppercase tracking-widest">Scroll</span>
+          <ChevronDown size={20} />
         </div>
       </section>
 
@@ -184,47 +215,47 @@ export default function Home() {
           </div>
 
           <div ref={featuresRef} className="space-y-12">
-             {/* Row 1: Right to Left */}
-             <div className="relative flex overflow-hidden group">
-                <div className="flex gap-8 animate-marquee-left pause-on-hover whitespace-nowrap">
-                    {[...topFeatures, ...topFeatures, ...topFeatures, ...topFeatures].map((feature, i) => (
-                        <FeatureCard key={`top-${i}`} {...feature} />
-                    ))}
-                </div>
-             </div>
+            {/* Row 1: Right to Left */}
+            <div className="relative flex overflow-hidden group">
+              <div className="flex gap-8 animate-marquee-left pause-on-hover whitespace-nowrap">
+                {[...topFeatures, ...topFeatures, ...topFeatures, ...topFeatures].map((feature, i) => (
+                  <FeatureCard key={`top-${i}`} {...feature} />
+                ))}
+              </div>
+            </div>
 
-             {/* Row 2: Left to Right */}
-             <div className="relative flex overflow-hidden group">
-                <div className="flex gap-8 animate-marquee-right pause-on-hover whitespace-nowrap">
-                    {[...bottomFeatures, ...bottomFeatures, ...bottomFeatures, ...bottomFeatures].map((feature, i) => (
-                        <FeatureCard key={`bottom-${i}`} {...feature} />
-                    ))}
-                </div>
-             </div>
+            {/* Row 2: Left to Right */}
+            <div className="relative flex overflow-hidden group">
+              <div className="flex gap-8 animate-marquee-right pause-on-hover whitespace-nowrap">
+                {[...bottomFeatures, ...bottomFeatures, ...bottomFeatures, ...bottomFeatures].map((feature, i) => (
+                  <FeatureCard key={`bottom-${i}`} {...feature} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      
+
       {/* Call to Action */}
       <section ref={ctaRef} className="w-full min-h-screen py-32 px-4 relative flex flex-col items-center justify-center overflow-hidden">
-         {/* Spline Background for CTA */}
-         <div className="absolute inset-0 z-0">
-            <LazySpline 
-              scene="https://prod.spline.design/eLIqSp2nblqvyfw4/scene.splinecode" 
-              className="w-full h-full"
-            />
-         </div>
+        {/* Spline Background for CTA */}
+        <div className="absolute inset-0 z-0">
+          <LazySpline
+            scene="https://prod.spline.design/eLIqSp2nblqvyfw4/scene.splinecode"
+            className="w-full h-full"
+          />
+        </div>
 
-         {/* Gradient Overlay - reduced opacity for better visibility */}
-         <div className="absolute inset-0 bg-gradient-to-t from-premium-black via-transparent to-transparent z-0 pointer-events-none" />
+        {/* Gradient Overlay - reduced opacity for better visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-premium-black via-transparent to-transparent z-0 pointer-events-none" />
 
-         <div className="cta-content max-w-4xl mx-auto text-center space-y-8 p-12 rounded-[3rem] border border-white/5 bg-premium-black/60 z-10 relative pointer-events-none">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter">Ready to dive in?</h2>
-            <p className="text-xl text-gray-400">Join thousands of students mastering their craft with NotesVerse.</p>
-            <Link href="/signup" className="inline-block px-12 py-5 bg-accent-blue text-navy-blue rounded-full font-bold text-xl hover:bg-white hover:scale-105 transition-all duration-300 shadow-[0_0_30px_-5px_rgba(218,218,218,0.3)] pointer-events-auto">
-                Join Now
-            </Link>
-         </div>
+        <div className="cta-content max-w-4xl mx-auto text-center space-y-8 p-12 rounded-[3rem] border border-white/5 bg-premium-black/60 z-10 relative pointer-events-none">
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tighter">Ready to dive in?</h2>
+          <p className="text-xl text-gray-400">Join thousands of students mastering their craft with NotesVerse.</p>
+          <Link href="/signup" className="inline-block px-12 py-5 bg-accent-blue text-navy-blue rounded-full font-bold text-xl hover:bg-white hover:scale-105 transition-all duration-300 shadow-[0_0_30px_-5px_rgba(218,218,218,0.3)] pointer-events-auto">
+            Join Now
+          </Link>
+        </div>
       </section>
     </div>
   );

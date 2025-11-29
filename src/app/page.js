@@ -150,14 +150,28 @@ export default function Home() {
   if (username) {
     return (
       <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono space-y-8">
-        <div className="text-center space-y-4 z-10">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse">HELLO, {username.toUpperCase()}</h1>
-          <p className="text-gray-400">WELCOME TO THE TAVERN</p>
-        </div>
 
-        {/* Spline Scene */}
-        <div className="w-full h-[400px] max-w-4xl relative z-0">
-          <Spline scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode" />
+        {/* Hero Section with Spline Background */}
+        <div className="relative w-full max-w-4xl h-[400px] flex items-center justify-center">
+          {/* Spline Scene (Background) */}
+          <div className="absolute inset-0 z-0">
+            <Spline
+              scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
+              onLoad={(spline) => {
+                const namesToHide = ['Text', 'Hint', 'Mouse', 'Cursor', 'Instruction'];
+                namesToHide.forEach(name => {
+                  const obj = spline.findObjectByName(name);
+                  if (obj) obj.visible = false;
+                });
+              }}
+            />
+          </div>
+
+          {/* Username Text (Foreground) */}
+          <div className="text-center space-y-4 z-10 pointer-events-none">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse drop-shadow-2xl">HELLO, {username.toUpperCase()}</h1>
+            <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl px-4 z-10">

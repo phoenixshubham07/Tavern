@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { Home, Book, Timer, Gamepad2, HelpCircle, PenTool } from "lucide-react";
 
 const navItems = [
-  { name: "Home", path: "/", icon: Home },
   { name: "inkFLOW", path: "/notes", icon: Book },
-  { name: "Timer", path: "/timer", icon: Timer },
-  { name: "Games", path: "/games", icon: Gamepad2 },
+  { name: "Features", path: "/timer", icon: Timer },
   { name: "FAQ", path: "/faq", icon: HelpCircle },
   { name: "Contribute", path: "/contribute", icon: PenTool },
 ];
@@ -21,14 +19,16 @@ export default function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl"
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl"
     >
-      <div className="bg-glass-white backdrop-blur-md border border-white/10 rounded-full px-6 py-3 shadow-2xl flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="bg-glass-white backdrop-blur-md border border-white/10 rounded-full px-6 py-3 shadow-2xl flex items-center justify-between relative">
+        {/* Left: Logo */}
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity">
             <span className="text-accent-blue font-bold text-2xl tracking-tighter font-gilroy">TAVERN</span>
-        </div>
+        </Link>
         
-        <div className="flex items-center gap-1">
+        {/* Center: Nav Items */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
@@ -37,7 +37,7 @@ export default function Navbar() {
               <Link
                 key={item.path}
                 href={item.path}
-                className="relative px-3 py-2 rounded-full transition-colors duration-300 group"
+                className="relative px-4 py-2 rounded-full transition-colors duration-300 group"
               >
                 {isActive && (
                   <motion.div
@@ -53,6 +53,16 @@ export default function Navbar() {
               </Link>
             );
           })}
+        </div>
+
+        {/* Right: Login Button */}
+        <div className="flex-shrink-0">
+            <Link 
+                href="/login"
+                className="px-6 py-2 bg-white text-black rounded-full font-bold text-sm hover:bg-gray-200 transition-colors shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]"
+            >
+                Login
+            </Link>
         </div>
       </div>
     </motion.nav>

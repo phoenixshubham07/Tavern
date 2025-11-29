@@ -8,6 +8,42 @@ import LazySpline from "@/components/LazySpline";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const topFeatures = [
+  {
+    icon: <Users size={40} className="text-accent-blue" />,
+    title: "Collaborative Notes",
+    description: "Share and edit notes with peers in real-time."
+  },
+  {
+    icon: <Clock size={40} className="text-purple-400" />,
+    title: "Smart Timer",
+    description: "Track your study hours per subject."
+  },
+  {
+    icon: <Trophy size={40} className="text-yellow-400" />,
+    title: "Gamified Learning",
+    description: "Earn streaks and climb leaderboards."
+  }
+];
+
+const bottomFeatures = [
+  {
+    icon: <Zap size={40} className="text-orange-400" />,
+    title: "Instant Sync",
+    description: "Your notes are available everywhere, instantly."
+  },
+  {
+    icon: <Shield size={40} className="text-green-400" />,
+    title: "Premium Privacy",
+    description: "End-to-end encryption ensures your notes stay private."
+  },
+  {
+    icon: <Gamepad2 size={40} className="text-pink-400" />,
+    title: "Study Games",
+    description: "Take a break with built-in mini-games."
+  }
+];
+
 export default function Home() {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
@@ -117,7 +153,7 @@ export default function Home() {
           
           <div className="hero-text-item flex items-center justify-center gap-6 pt-8 pointer-events-auto">
             <Link
-              href="/notes"
+              href="/login"
               className="group relative px-8 py-4 bg-white text-black rounded-full font-semibold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -140,44 +176,31 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="w-full py-32 px-4 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-24">
+      <section className="w-full py-32 relative overflow-hidden">
+        <div className="max-w-full">
+          <div className="text-center mb-24 px-4">
             <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">Elevate Your Learning</h2>
             <p className="text-gray-400 text-xl max-w-2xl mx-auto">Everything you need to excel, wrapped in a beautiful, distraction-free interface.</p>
           </div>
 
-          <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Users size={40} className="text-accent-blue" />}
-              title="Collaborative Notes"
-              description="Share and edit notes with peers in real-time. A GitHub-like experience for your knowledge base."
-            />
-            <FeatureCard
-              icon={<Clock size={40} className="text-purple-400" />}
-              title="Smart Timer"
-              description="Track your study hours per subject. Visualize your productivity and stay on track."
-            />
-            <FeatureCard
-              icon={<Trophy size={40} className="text-yellow-400" />}
-              title="Gamified Learning"
-              description="Earn streaks, climb leaderboards, and challenge friends to study sessions."
-            />
-            <FeatureCard
-              icon={<Zap size={40} className="text-orange-400" />}
-              title="Instant Sync"
-              description="Your notes are available everywhere, instantly. Seamlessly switch between devices."
-            />
-            <FeatureCard
-              icon={<Shield size={40} className="text-green-400" />}
-              title="Premium Privacy"
-              description="Your data is yours. End-to-end encryption ensures your personal notes stay private."
-            />
-            <FeatureCard
-              icon={<Gamepad2 size={40} className="text-pink-400" />}
-              title="Study Games"
-              description="Take a break with built-in mini-games designed to refresh your mind without breaking flow."
-            />
+          <div ref={featuresRef} className="space-y-12">
+             {/* Row 1: Right to Left */}
+             <div className="relative flex overflow-hidden group">
+                <div className="flex gap-8 animate-marquee-left pause-on-hover whitespace-nowrap">
+                    {[...topFeatures, ...topFeatures, ...topFeatures, ...topFeatures].map((feature, i) => (
+                        <FeatureCard key={`top-${i}`} {...feature} />
+                    ))}
+                </div>
+             </div>
+
+             {/* Row 2: Left to Right */}
+             <div className="relative flex overflow-hidden group">
+                <div className="flex gap-8 animate-marquee-right pause-on-hover whitespace-nowrap">
+                    {[...bottomFeatures, ...bottomFeatures, ...bottomFeatures, ...bottomFeatures].map((feature, i) => (
+                        <FeatureCard key={`bottom-${i}`} {...feature} />
+                    ))}
+                </div>
+             </div>
           </div>
         </div>
       </section>
@@ -209,7 +232,7 @@ export default function Home() {
 
 function FeatureCard({ icon, title, description }) {
   return (
-    <div className="feature-card p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent-blue/30 transition-all duration-500 group cursor-default hover:-translate-y-2 will-change-transform">
+    <div className="feature-card min-w-[350px] p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent-blue/30 transition-all duration-500 group cursor-default hover:-translate-y-2 will-change-transform">
       <div className="mb-6 p-4 bg-white/5 rounded-2xl w-fit group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
         {icon}
       </div>

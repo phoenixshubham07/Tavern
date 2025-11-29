@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, Clock, Users, Trophy, Zap, Shield, Gamepad2, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import LazySpline from "@/components/LazySpline";
-import Spline from '@splinetool/react-spline';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -149,29 +148,20 @@ export default function Home() {
 
   if (username) {
     return (
-      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono relative overflow-hidden">
-
-        {/* Spline 3D Scene Background */}
-        <div className="absolute inset-0 z-0 opacity-80">
-          <Spline scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode" />
+      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse">HELLO, {username.toUpperCase()}</h1>
+          <p className="text-gray-400">WELCOME TO THE TAVERN</p>
         </div>
 
-        {/* Content Overlay */}
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full max-w-4xl p-4 pointer-events-none">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse drop-shadow-2xl">HELLO, {username.toUpperCase()}</h1>
-            <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 pointer-events-auto">
-            <Link href="/inkflow" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-accent-blue transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
-              <p className="text-sm text-gray-300">Digitize and version control your handwritten notes.</p>
-            </Link>
-            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg">
-              <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
-              <p className="text-sm text-gray-300">Complete daily challenges to earn XP.</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl px-4">
+          <Link href="/inkflow" className="p-6 border border-white/10 rounded-xl hover:bg-white/5 transition-all group">
+            <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
+            <p className="text-sm text-gray-400">Digitize and version control your handwritten notes.</p>
+          </Link>
+          <div className="p-6 border border-white/10 rounded-xl hover:bg-white/5 transition-all group cursor-not-allowed opacity-50">
+            <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
+            <p className="text-sm text-gray-400">Complete daily challenges to earn XP.</p>
           </div>
         </div>
       </div>

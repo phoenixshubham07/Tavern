@@ -41,6 +41,11 @@ const bottomFeatures = [
     icon: <Gamepad2 size={40} className="text-pink-400" />,
     title: "Study Games",
     description: "Take a break with built-in mini-games."
+  },
+  {
+    icon: <span className="text-4xl">✒️</span>,
+    title: "InkFlow",
+    description: "Convert handwritten notes to Markdown with AI version control."
   }
 ];
 
@@ -262,7 +267,7 @@ export default function Home() {
 }
 
 function FeatureCard({ icon, title, description }) {
-  return (
+  const CardContent = (
     <div className="feature-card min-w-[350px] p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent-blue/30 transition-all duration-500 group cursor-default hover:-translate-y-2 will-change-transform">
       <div className="mb-6 p-4 bg-white/5 rounded-2xl w-fit group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
         {icon}
@@ -271,4 +276,14 @@ function FeatureCard({ icon, title, description }) {
       <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{description}</p>
     </div>
   );
+
+  if (title === "InkFlow") {
+    return (
+      <Link href="/inkflow">
+        {CardContent}
+      </Link>
+    );
+  }
+
+  return CardContent;
 }

@@ -7,8 +7,8 @@ import SmoothScroll from "../components/SmoothScroll";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
-  title: "NotesVerse - Premium Collaborative Notes",
-  description: "A premium platform for sharing notes, tracking study time, and gamifying your learning journey.",
+  title: "Tavern - Collaborative Learning & Version Control",
+  description: "A premium platform for sharing notes, tracking study time, and version controlling your handwritten ideas with InkFlow.",
 };
 
 export default function RootLayout({ children }) {

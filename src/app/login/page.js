@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, ArrowRight, Cpu, Disc, Activity, Type } from 'lucide-react';
-import { login, signup, signInWithGoogle } from './actions';
+import { login, signup } from './actions';
+import { createClient } from '@/utils/supabase/client';
 
 // ==========================================
 // 1. TAVERN GLITCH COMPONENT
@@ -208,6 +209,16 @@ export default function LoginPage() {
 
     useEffect(() => { setTimeout(() => setIntro(true), 500); }, []);
 
+    const handleGoogleLogin = async () => {
+        const supabase = createClient();
+        await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+    };
+
 
 
     return (
@@ -319,7 +330,7 @@ export default function LoginPage() {
                                     </span>
                                 </button>
 
-                                <button type="button" onClick={() => signInWithGoogle()} className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
+                                <button type="button" onClick={handleGoogleLogin} className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
                                     <span className="relative flex items-center justify-center gap-2">
                                         Google Auth
                                     </span>

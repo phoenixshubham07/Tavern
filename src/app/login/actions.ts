@@ -45,16 +45,4 @@ export async function signup(formData: FormData) {
   redirect('/auth/verify-email')
 }
 
-export async function signInWithGoogle() {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')}/auth/callback`,
-    },
-  })
 
-  if (data.url) {
-    redirect(data.url)
-  }
-}

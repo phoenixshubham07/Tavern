@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, ArrowRight, Cpu, Disc, Activity, Type } from 'lucide-react';
-import { signIn } from "next-auth/react";
+import { login, signup, signInWithGoogle } from './actions';
 
 // ==========================================
 // 1. TAVERN GLITCH COMPONENT
@@ -208,19 +208,7 @@ export default function LoginPage() {
 
     useEffect(() => { setTimeout(() => setIntro(true), 500); }, []);
 
-    const handleCredentialsLogin = async (e) => {
-        e.preventDefault();
-        // For now, using the mock credentials provider
-        await signIn("credentials", {
-            email,
-            password,
-            callbackUrl: "/" // Redirect to home on success
-        });
-    };
 
-    const handleGoogleLogin = async () => {
-        await signIn("google", { callbackUrl: "/" });
-    };
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden bg-black font-mono cursor-none">
@@ -263,7 +251,7 @@ export default function LoginPage() {
                                 </h2>
                             </div>
 
-                            <form onSubmit={handleCredentialsLogin} className="space-y-6 text-left">
+                            <form className="space-y-6 text-left">
 
                                 {/* NAME INPUT (Only shows in Sign Up mode) */}
                                 {!isSignIn && (
@@ -274,6 +262,7 @@ export default function LoginPage() {
                                                 <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Full Name</label>
                                                 <input
                                                     type="text"
+                                                    name="fullName"
                                                     value={name}
                                                     onChange={e => setName(e.target.value)}
                                                     onFocus={() => setIsFocused(true)}
@@ -292,7 +281,8 @@ export default function LoginPage() {
                                         <div className="flex-1">
                                             <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Identity</label>
                                             <input
-                                                type="text"
+                                                type="email"
+                                                name="email"
                                                 value={email}
                                                 onChange={e => setEmail(e.target.value)}
                                                 onFocus={() => setIsFocused(true)}
@@ -311,6 +301,7 @@ export default function LoginPage() {
                                             <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Key</label>
                                             <input
                                                 type="password"
+                                                name="password"
                                                 value={password}
                                                 onChange={e => setPassword(e.target.value)}
                                                 onFocus={() => setIsFocused(true)}
@@ -322,13 +313,13 @@ export default function LoginPage() {
                                 </div>
 
                                 {/* Buttons */}
-                                <button type="submit" className="cursor-pointer group relative w-full h-14 bg-white text-black font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all duration-300 overflow-hidden">
+                                <button formAction={isSignIn ? login : signup} className="cursor-pointer group relative w-full h-14 bg-white text-black font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all duration-300 overflow-hidden">
                                     <span className="relative flex items-center justify-center gap-3">
                                         {isSignIn ? 'Connect' : 'Register'} <ArrowRight size={18} />
                                     </span>
                                 </button>
 
-                                <button type="button" onClick={handleGoogleLogin} className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
+                                <button type="button" onClick={() => signInWithGoogle()} className="cursor-pointer group relative w-full h-14 bg-transparent border border-white/10 text-gray-400 font-bold uppercase tracking-[0.1em] hover:border-white hover:text-white transition-all duration-300 overflow-hidden text-xs">
                                     <span className="relative flex items-center justify-center gap-2">
                                         Google Auth
                                     </span>

@@ -35,7 +35,7 @@ export default function InkFlowPage() {
     if (result.text) {
       setMarkdown(result.text)
     } else {
-      alert('Transcription failed')
+      alert(`Transcription failed: ${result.error}`)
     }
     
     setIsTranscribing(false)

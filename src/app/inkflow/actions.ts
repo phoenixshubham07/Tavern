@@ -18,7 +18,7 @@ export async function transcribeImage(formData: FormData) {
   const base64 = Buffer.from(arrayBuffer).toString('base64')
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
     
     const prompt = "You are an expert transcriber. Convert this image into clean, formatted Markdown. Fix spelling errors caused by handwriting. Do not add conversational filler. Just return the markdown."
     
@@ -36,9 +36,9 @@ export async function transcribeImage(formData: FormData) {
     const text = response.text()
     
     return { text }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gemini Error:', error)
-    return { error: 'Failed to transcribe image' }
+    return { error: error.message || 'Failed to transcribe image' }
   }
 }
 

@@ -42,7 +42,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/auth/verify-email')
 }
 
 export async function signInWithGoogle() {

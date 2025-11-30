@@ -145,35 +145,6 @@ export default function Home() {
     return () => ctx.revert();
   }, [loading, username]);
 
-  if (loading) return <div className="bg-black h-screen w-full flex items-center justify-center text-white font-mono">LOADING...</div>;
-
-  useEffect(() => {
-    // Global hack to remove Spline hint text
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.addedNodes.length) {
-          const hints = document.querySelectorAll('div');
-          hints.forEach(el => {
-            if (el.textContent === 'Move your mouse to look around' ||
-              el.textContent === 'Drag to rotate' ||
-              el.textContent.includes('Move your mouse')) {
-              el.style.display = 'none';
-              el.style.opacity = '0';
-              el.style.pointerEvents = 'none';
-            }
-          });
-        }
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   if (username) {
     return (
       <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono relative overflow-hidden">

@@ -128,7 +128,7 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser, embedded = fa
                 onClick={() => {
                   onSelectUser(contact)
                   setUnreadCounts(prev => ({ ...prev, [contact.id]: 0 }))
-                  onClose()
+                  onClose?.()
                 }}
                 className="p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3"
               >

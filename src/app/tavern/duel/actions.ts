@@ -22,7 +22,7 @@ type Flashcard = {
   question: string
   options: string[]
   answer: string
-  svg: string
+  image_url: string
 }
 
 // --- Matchmaking ---
@@ -100,10 +100,7 @@ export async function generateDeck(matchId: string, year: string, stream: string
     2. A Trick Question (e.g., "Powerhouse of the cell?")
     3. 4 Options (1 correct, 3 distractors)
     4. The Correct Answer (must match one of the options exactly)
-    5. An Educational SVG Diagram (800x600) that visually explains the concept.
-       - Dark background (#1a1b1e).
-       - White lines, clear labels, diagrammatic style.
-       - NO ANSWER TEXT in the image.
+    5. A simple, single-word or two-word SEARCH KEYWORD for an image representing the concept (e.g., "mitochondria", "cell", "dna").
     
     Output ONLY JSON:
     [
@@ -112,7 +109,7 @@ export async function generateDeck(matchId: string, year: string, stream: string
         "question": "...",
         "options": ["A", "B", "C", "D"],
         "answer": "A",
-        "svg": "<svg>...</svg>"
+        "image_keyword": "..."
       },
       ...
     ]
@@ -130,7 +127,13 @@ export async function generateDeck(matchId: string, year: string, stream: string
       text = text.substring(jsonStart, jsonEnd + 1)
     }
 
-    const deck: Flashcard[] = JSON.parse(text)
+    const rawDeck = JSON.parse(text)
+    
+    // Transform to include image_url
+    const deck: Flashcard[] = rawDeck.map((card: any) => ({
+      ...card,
+      image_url: `https://loremflickr.com/800/600/${encodeURIComponent(card.image_keyword)}/all`
+    }))
 
     // Update Match
     await supabase

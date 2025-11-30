@@ -37,6 +37,9 @@ export default function WorldChat() {
       if (data) setMessages(data)
       scrollToBottom()
 
+      // Store user ID for realtime filtering
+      const currentUserId = user?.id
+
       // Realtime Subscription
       const channel = supabase
         .channel('world-chat')
@@ -45,6 +48,9 @@ export default function WorldChat() {
           schema: 'public', 
           table: 'world_chat' 
         }, (payload) => {
+          // Fix duplication: Ignore our own messages (already added optimistically)
+          if (payload.new.sender_id === currentUserId) return
+
           setMessages(prev => [...prev, payload.new as Message])
           scrollToBottom()
         })
@@ -92,6 +98,12 @@ export default function WorldChat() {
     }
   }
 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null))
+  }, [])
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -103,20 +115,39 @@ export default function WorldChat() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => (
-          <div key={msg.id} className="group flex hover:bg-[#32353b] -mx-4 px-4 py-1">
-            <div className="w-10 h-10 rounded-full bg-accent-blue flex-shrink-0 mr-4 mt-1 flex items-center justify-center font-bold text-navy-blue">
-              {msg.username[0].toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-white hover:underline cursor-pointer">{msg.username}</span>
-                <span className="text-xs text-gray-400">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        {messages.map((msg) => {
+          const isMe = msg.sender_id === currentUserId
+          // User requested: Me = Left, Others = Right
+          // Standard is usually Me = Right, but we follow instructions.
+          
+          return (
+            <div key={msg.id} className={`flex w-full ${isMe ? 'justify-start' : 'justify-end'}`}>
+              <div className={`flex max-w-[80%] ${isMe ? 'flex-row' : 'flex-row-reverse'} gap-2`}>
+                
+                {/* Avatar */}
+                <div className="w-8 h-8 rounded-full bg-accent-blue flex-shrink-0 flex items-center justify-center font-bold text-navy-blue text-xs">
+                  {msg.username[0].toUpperCase()}
+                </div>
+
+                {/* Bubble */}
+                <div className={`flex flex-col ${isMe ? 'items-start' : 'items-end'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-gray-400 font-bold">{msg.username}</span>
+                    <span className="text-[10px] text-gray-500">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <div className={`px-4 py-2 rounded-2xl text-sm ${
+                    isMe 
+                      ? 'bg-[#5865f2] text-white rounded-tl-none' 
+                      : 'bg-[#40444b] text-gray-100 rounded-tr-none'
+                  }`}>
+                    {msg.content}
+                  </div>
+                </div>
+
               </div>
-              <p className="text-gray-300 whitespace-pre-wrap break-words">{msg.content}</p>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={messagesEndRef} />
       </div>
 

@@ -14,7 +14,7 @@ type Flashcard = {
 }
 
 type MatchState = {
-  status: 'loading' | 'active' | 'finished'
+  status: 'loading' | 'active' | 'finished' | 'error'
   current_round: number
   scores: { p1: number; p2: number }
   deck: Flashcard[]
@@ -83,6 +83,21 @@ export default function Arena({ matchId }: { matchId: string }) {
     }
   }
 
+  if (match && match.status === 'error') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="text-red-500 font-bold text-2xl">Connection Failed</div>
+        <p className="text-gray-400">The AI Wizard is taking a nap. Please try again.</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white font-bold"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
   if (!match || match.status === 'loading' || !match.deck) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -123,7 +138,7 @@ export default function Arena({ matchId }: { matchId: string }) {
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-[#1a1b1e] p-6 rounded-2xl border border-white/10">
           <h3 className="text-gray-400 uppercase font-bold text-sm">Round</h3>
-          <p className="text-4xl font-black">{match.current_round} / 5</p>
+          <p className="text-4xl font-black">{match.current_round} / 3</p>
         </div>
         
         <div className="bg-[#1a1b1e] p-6 rounded-2xl border border-white/10 space-y-4">

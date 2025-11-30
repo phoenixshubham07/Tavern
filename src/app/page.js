@@ -199,59 +199,39 @@ export default function Home() {
 
   if (username) {
     return (
-      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono relative overflow-hidden">
+      <div className="h-screen w-full bg-[#202225] text-white flex font-mono overflow-hidden">
 
-        {/* Spline 3D Scene Background */}
-        <div className="absolute inset-0 z-0 opacity-80">
-          <Spline
-            scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
-          />
-        </div>
-
+        {/* Left: Messages Sidebar (Embedded) */}
         <DMSidebar
-          isOpen={showDMs}
-          onClose={() => setShowDMs(false)}
+          embedded={true}
           onSelectUser={(user) => setActiveChatUser(user)}
         />
 
-        {activeChatUser && (
-          <ChatWindow
-            recipientId={activeChatUser.id}
-            recipientName={activeChatUser.username}
-            onClose={() => setActiveChatUser(null)}
-          />
-        )}
-
-        <div className="absolute top-6 right-6 z-20">
-          <button
-            onClick={() => setShowDMs(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-sm font-bold uppercase tracking-wide backdrop-blur-md border border-white/10"
-          >
-            <span className="text-lg">💬</span> Messages
-          </button>
-        </div>
-
-        {/* Content Overlay */}
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full max-w-4xl p-4 pointer-events-none">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse drop-shadow-2xl">HELLO, {username.toUpperCase()}</h1>
-            <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>
+        {/* Right: Main Content / Chat Area */}
+        <div className="flex-1 flex flex-col relative bg-[#36393f]">
+          {/* Spline Background (Subtle) */}
+          <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+            <Spline scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 pointer-events-auto">
-            <Link href="/inkflow" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-accent-blue transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
-              <p className="text-sm text-gray-300">Digitize and version control your handwritten notes.</p>
-            </Link>
-            <Link href="/roaster" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-red-500 transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-red-500">🔥 CV Roaster</h3>
-              <p className="text-sm text-gray-300">Get your resume roasted by AI. Savage mode on.</p>
-            </Link>
-            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg md:col-span-2">
-              <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
-              <p className="text-sm text-gray-300">Complete daily challenges to earn XP.</p>
+          {activeChatUser ? (
+            <div className="relative z-10 h-full">
+              <ChatWindow
+                recipientId={activeChatUser.id}
+                recipientName={activeChatUser.username}
+                onClose={() => setActiveChatUser(null)}
+                embedded={true} // We might need to update ChatWindow to be embedded too, or just style it here
+              />
             </div>
-          </div>
+          ) : (
+            <div className="relative z-10 flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
+              <div className="p-6 rounded-full bg-black/20">
+                <span className="text-4xl">👋</span>
+              </div>
+              <h2 className="text-2xl font-bold">Welcome to the Tavern</h2>
+              <p>Select a conversation to start chatting.</p>
+            </div>
+          )}
         </div>
       </div>
     );

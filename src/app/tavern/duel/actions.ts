@@ -11,7 +11,7 @@ type Duelmatch = {
   id: string
   player1_id: string
   player2_id: string
-  status: 'loading' | 'active' | 'finished'
+  status: 'loading' | 'active' | 'finished' | 'error'
   current_round: number
   scores: { p1: number; p2: number }
   deck: Flashcard[] | null
@@ -93,7 +93,7 @@ export async function generateDeck(matchId: string, year: string, stream: string
     const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
     
     const prompt = `
-    Generate 5 DIFFICULT flashcards for a ${year} ${stream} student.
+    Generate 3 DIFFICULT flashcards for a ${year} ${stream} student.
     
     For each flashcard, generate:
     1. A Concept (e.g., "Mitochondria")
@@ -134,7 +134,11 @@ export async function generateDeck(matchId: string, year: string, stream: string
 
   } catch (error) {
     console.error('Deck Generation Error:', error)
-    // Handle error (maybe set status to error)
+    // Set status to error so client knows to stop loading
+    await supabase
+      .from('duel_matches')
+      .update({ status: 'error' }) // Ensure 'error' is handled in UI or just use 'finished' with 0 score
+      .eq('id', matchId)
   }
 }
 
@@ -184,7 +188,7 @@ export async function submitMove(matchId: string, round: number, answer: string)
     if (p2Move?.answer === currentCard.answer) p2Score += 10
 
     const nextRound = round + 1
-    const newStatus = nextRound > 5 ? 'finished' : 'active'
+    const newStatus = nextRound > 3 ? 'finished' : 'active' // Updated to 3 rounds
 
     await supabase
       .from('duel_matches')

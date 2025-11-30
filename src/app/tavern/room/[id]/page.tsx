@@ -37,7 +37,7 @@ export default function StudyRoomPage() {
 
   if (!joined) {
     return (
-      <div className="min-h-screen bg-[#202225] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="bg-[#36393f] p-8 rounded-2xl shadow-2xl max-w-md w-full space-y-6 border border-white/10">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-white">Study Hall {roomId}</h1>
@@ -83,7 +83,7 @@ export default function StudyRoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#202225] text-white p-8">
+    <div className="min-h-screen bg-black text-white p-8">
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
         
         {/* Top: Timer & Controls */}

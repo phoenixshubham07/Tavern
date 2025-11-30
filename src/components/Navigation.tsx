@@ -12,7 +12,11 @@ export default function Navigation({ user }: { user: any }) {
   // Actually, if we are on login page, we might want just Navbar or nothing.
   // Let's keep it simple: User ? Sidebar : Navbar
   
-  if (user) {
+  // Routes where we want a clean, full-screen experience (no sidebar)
+  const hiddenRoutes = ['/roaster', '/tavern/duel', '/tavern/room', '/server']
+  const shouldHideSidebar = hiddenRoutes.some(route => pathname?.startsWith(route))
+
+  if (user && !shouldHideSidebar) {
     return <Sidebar user={user} />
   }
 

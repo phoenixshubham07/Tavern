@@ -9,7 +9,7 @@ export default function ServerPage() {
   const [activeChannel, setActiveChannel] = useState<'world-chat' | 'voice-general' | 'voice-music'>('world-chat')
 
   return (
-    <div className="flex h-screen bg-[#202225] text-white font-mono pl-20">
+    <div className="flex h-screen bg-black text-white font-mono">
       {/* Channels Sidebar */}
       <div className="w-64 bg-[#2f3136] flex flex-col">
         {/* Server Header */}

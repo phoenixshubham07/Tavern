@@ -3,6 +3,7 @@ import "./globals.css";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import SmoothScroll from "../components/SmoothScroll";
+import ClientLayout from "../components/ClientLayout";
 import { createClient } from "@/utils/supabase/server";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -21,9 +22,9 @@ export default async function RootLayout({ children }) {
       <body className={`${inter.variable} font-sans antialiased text-white selection:bg-accent-blue selection:text-navy-blue`}>
         <SmoothScroll>
           <Navigation user={user} />
-          <main className={`min-h-screen pt-24 ${user ? 'pl-24' : ''} transition-all duration-300`}>
+          <ClientLayout user={user}>
             {children}
-          </main>
+          </ClientLayout>
           {!user && <Footer />}
         </SmoothScroll>
       </body>

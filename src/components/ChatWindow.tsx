@@ -28,34 +28,42 @@ export default function ChatWindow({ recipientId, recipientName, onClose }: Chat
   useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setCurrentUserId(user.id)
+      if (user) {
+        setCurrentUserId(user.id)
+        
+        // Fetch initial messages
+        const initialMessages = await getDirectMessages(recipientId)
+        setMessages(initialMessages)
+        scrollToBottom()
 
-      const initialMessages = await getDirectMessages(recipientId)
-      setMessages(initialMessages)
-      scrollToBottom()
-    }
-    init()
+        // Realtime Subscription (Only subscribe after we have user ID)
+        const channel = supabase
+          .channel(`chat:${recipientId}`)
+          .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'direct_messages',
+            filter: `recipient_id=eq.${user.id}` // Listen for incoming messages
+          }, (payload) => {
+            const newMsg = payload.new as Message
+            // Only add if it's from the person we are chatting with
+            if (newMsg.sender_id === recipientId) {
+                 setMessages(prev => [...prev, newMsg])
+                 scrollToBottom()
+            }
+          })
+          .subscribe()
 
-    // Realtime Subscription
-    const channel = supabase
-      .channel(`chat:${recipientId}`)
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'direct_messages',
-        filter: `recipient_id=eq.${currentUserId}` // Listen for incoming messages
-      }, (payload) => {
-        // Optimistic update or fetch? Let's just append if it matches our chat
-        const newMsg = payload.new as Message
-        if (newMsg.sender_id === recipientId || newMsg.sender_id === currentUserId) {
-             setMessages(prev => [...prev, newMsg])
-             scrollToBottom()
+        return () => {
+          supabase.removeChannel(channel)
         }
-      })
-      .subscribe()
-
+      }
+    }
+    
+    const cleanupPromise = init()
+    
     return () => {
-      supabase.removeChannel(channel)
+      cleanupPromise.then(cleanup => cleanup && cleanup())
     }
   }, [recipientId])
 

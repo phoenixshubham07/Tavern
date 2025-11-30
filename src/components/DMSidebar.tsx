@@ -27,6 +27,47 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser }: { isOpen: b
     }
   }, [isOpen])
 
+  // Unread Messages Logic
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    const supabase = createClient()
+    let channel: any;
+
+    const setupRealtime = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      channel = supabase
+        .channel('dm_notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'direct_messages',
+            filter: `recipient_id=eq.${user.id}`,
+          },
+          (payload) => {
+            const senderId = payload.new.sender_id
+            setUnreadCounts((prev) => ({
+              ...prev,
+              [senderId]: (prev[senderId] || 0) + 1,
+            }))
+            
+            // Optional: Play a sound or show a toast here
+          }
+        )
+        .subscribe()
+    }
+
+    setupRealtime()
+
+    return () => {
+      if (channel) supabase.removeChannel(channel)
+    }
+  }, [])
+
   // Presence Logic
   useEffect(() => {
     const supabase = createClient()
@@ -82,6 +123,7 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser }: { isOpen: b
                 key={contact.id} 
                 onClick={() => {
                   onSelectUser(contact)
+                  setUnreadCounts(prev => ({ ...prev, [contact.id]: 0 }))
                   onClose()
                 }}
                 className="p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors flex items-center gap-3"
@@ -92,13 +134,20 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser }: { isOpen: b
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="font-bold text-gray-200">{contact.username}</div>
-                  <div className="text-xs text-gray-500 flex items-center gap-1">
-                    <Circle size={8} fill={isOnline ? '#3ba55c' : 'gray'} stroke="none" />
-                    {isOnline ? 'Online' : 'Offline'}
+                  <div className="flex-1 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-gray-200">{contact.username}</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                        <Circle size={8} fill={isOnline ? '#3ba55c' : 'gray'} stroke="none" />
+                        {isOnline ? 'Online' : 'Offline'}
+                      </div>
+                    </div>
+                    {unreadCounts[contact.id] > 0 && (
+                      <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">
+                        {unreadCounts[contact.id]}
+                      </div>
+                    )}
                   </div>
-                </div>
               </div>
             )
           })}

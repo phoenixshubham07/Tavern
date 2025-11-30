@@ -99,3 +99,122 @@ export async function getHistory() {
 
   return data || []
 }
+
+export async function shareNote(versionId: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Unauthorized' }
+
+  // Check if already shared
+  const { data: existing } = await supabase
+    .from('versions')
+    .select('share_token, is_public')
+    .eq('id', versionId)
+    .single()
+
+  if (existing?.is_public && existing?.share_token) {
+    return { success: true, token: existing.share_token }
+  }
+
+  // Generate token and publish
+  const { data, error } = await supabase
+    .from('versions')
+    .update({ 
+      is_public: true,
+      // If token exists, keep it, else generate new one. 
+      // Since we can't easily generate UUID in JS and pass to SQL without a library sometimes, 
+      // we rely on the default value in DB or generate here. 
+      // Let's generate here to be safe and return it immediately.
+      share_token: existing?.share_token || crypto.randomUUID()
+    })
+    .eq('id', versionId)
+    .eq('user_id', user.id) // Security check
+    .select('share_token')
+    .single()
+
+  if (error || !data) {
+    console.error('Share Error:', error)
+    return { error: 'Failed to share note' }
+  }
+
+  return { success: true, token: data.share_token }
+}
+
+export async function getSharedNote(token: string) {
+  const supabase = await createClient()
+  
+  // 1. Get the note version
+  const { data: note, error } = await supabase
+    .from('versions')
+    .select('*')
+    .eq('share_token', token)
+    .eq('is_public', true)
+    .single()
+
+  if (error || !note) {
+    return { error: 'Note not found or private' }
+  }
+
+  // 2. Get the owner's username
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', note.user_id)
+    .single()
+
+  return { 
+    note, 
+    ownerUsername: profile?.username || 'Unknown User' 
+  }
+}
+
+export async function remixNote(originalVersionId: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Unauthorized' }
+
+  // 1. Fetch original note to copy content
+  const { data: original } = await supabase
+    .from('versions')
+    .select('content_text, project_name')
+    .eq('id', originalVersionId)
+    .single()
+
+  if (!original) return { error: 'Original note not found' }
+
+  // 2. Get latest version number for current user
+  const { data: latestVersion } = await supabase
+    .from('versions')
+    .select('version_number')
+    .eq('user_id', user.id)
+    .eq('project_name', original.project_name)
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .single()
+
+  const nextVersionNumber = (latestVersion?.version_number || 0) + 1
+
+  // 3. Insert new version (Remix)
+  const { data: newNote, error } = await supabase
+    .from('versions')
+    .insert({
+      user_id: user.id,
+      project_name: original.project_name, // Keep same project name or append "Remix"
+      content_text: original.content_text,
+      version_number: nextVersionNumber,
+      parent_id: originalVersionId, // Attribution!
+      original_image_path: null, // No image for text remix
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('Remix Error:', error)
+    return { error: 'Failed to remix note' }
+  }
+
+  revalidatePath('/inkflow')
+  return { success: true, newNoteId: newNote.id }
+}

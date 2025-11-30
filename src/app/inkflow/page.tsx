@@ -1,9 +1,10 @@
+```
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, Save, History, ArrowLeft, RefreshCw, Check, FileText } from 'lucide-react'
+import { Upload, Save, History, ArrowLeft, RefreshCw, Check, FileText, Share2, Copy } from 'lucide-react'
 import Link from 'next/link'
-import { transcribeImage, saveVersion, getHistory } from './actions'
+import { transcribeImage, saveVersion, getHistory, shareNote, getLatestVersionMetadata } from './actions'
 
 export default function InkFlowPage() {
   const [image, setImage] = useState<string | null>(null)
@@ -13,14 +14,47 @@ export default function InkFlowPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [history, setHistory] = useState<any[]>([])
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [attribution, setAttribution] = useState<string | null>(null)
 
   useEffect(() => {
     loadHistory()
+    loadMetadata()
   }, [])
 
   async function loadHistory() {
     const data = await getHistory()
     setHistory(data)
+  }
+
+  async function loadMetadata() {
+    const meta = await getLatestVersionMetadata()
+    if (meta) {
+      setMarkdown(meta.content_text) // Load latest content
+      if (meta.parentOwner) {
+        setAttribution(meta.parentOwner)
+      }
+    }
+  }
+
+  async function handleShare() {
+    // First save current state
+    const saveResult = await saveVersion(markdown, null)
+    if (saveResult.error) {
+      alert('Please save your note before sharing.')
+      return
+    }
+    
+    // Then share
+    // We need to fetch the latest version ID since saveVersion returns version_number
+    await loadHistory()
+    const latest = await getHistory()
+    if (latest && latest.length > 0) {
+       const shareResult = await shareNote(latest[0].id)
+       if (shareResult.success) {
+         setShareUrl(`${window.location.origin}/share/${shareResult.token}`)
+       }
+    }
   }
 
   async function handleTranscribe() {
@@ -91,6 +125,21 @@ export default function InkFlowPage() {
           </h1>
         </div>
         <div className="flex items-center gap-4">
+          {shareUrl && (
+            <div className="flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg text-sm">
+              <span className="truncate max-w-[150px]">{shareUrl}</span>
+              <button onClick={() => navigator.clipboard.writeText(shareUrl)} className="hover:text-white">
+                <Copy size={14} />
+              </button>
+            </div>
+          )}
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-sm font-bold uppercase tracking-wide"
+            title="Share Public Link"
+          >
+            <Share2 size={16} /> Share
+          </button>
           <button 
             onClick={() => setShowHistory(!showHistory)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-bold uppercase tracking-wide ${showHistory ? 'bg-white text-black' : 'bg-white/10 hover:bg-white/20'}`}
@@ -106,6 +155,13 @@ export default function InkFlowPage() {
           </button>
         </div>
       </header>
+
+      {attribution && (
+        <div className="bg-accent-blue/10 border-b border-accent-blue/20 px-6 py-2 text-xs text-accent-blue flex items-center gap-2">
+          <Copy size={12} />
+          Remixed from @{attribution}'s version
+        </div>
+      )}
 
       {/* Main Content - Split Screen */}
       <main className="flex-1 flex overflow-hidden">

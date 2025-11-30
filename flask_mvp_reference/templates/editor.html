@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Editor - InkFlow</title>
+    <style>
+        .remix-source {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="editor-container">
+        <h1>Edit Note</h1>
+
+        <!-- Remix Attribution -->
+        {% if note.parent_id %}
+        <div class="remix-source">
+            Remixed from @{{ note.parent.owner.username }}'s version
+        </div>
+        {% endif %}
+
+        <textarea name="content" rows="10" cols="50">{{ note.content }}</textarea>
+
+        <br>
+        <button>Save Changes</button>
+    </div>
+</body>
+
+</html>

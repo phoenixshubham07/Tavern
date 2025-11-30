@@ -1,4 +1,4 @@
-```
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -46,13 +46,13 @@ export default function InkFlowPage() {
     }
     
     // Then share
-    // We need to fetch the latest version ID since saveVersion returns version_number
     await loadHistory()
     const latest = await getHistory()
     if (latest && latest.length > 0) {
        const shareResult = await shareNote(latest[0].id)
-       if (shareResult.success) {
-         setShareUrl(`${window.location.origin}/share/${shareResult.token}`)
+       if (shareResult.success && shareResult.token) {
+         const origin = typeof window !== 'undefined' ? window.location.origin : ''
+         setShareUrl(origin + '/share/' + shareResult.token)
        }
     }
   }

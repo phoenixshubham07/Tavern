@@ -218,3 +218,45 @@ export async function remixNote(originalVersionId: number) {
   revalidatePath('/inkflow')
   return { success: true, newNoteId: newNote.id }
 }
+
+export async function getLatestVersionMetadata() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  // Get latest version
+  const { data: latestVersion } = await supabase
+    .from('versions')
+    .select('content_text, parent_id')
+    .eq('user_id', user.id)
+    .eq('project_name', 'Default Project')
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (!latestVersion) return null
+
+  let parentOwner = null
+  if (latestVersion.parent_id) {
+    const { data: parentVersion } = await supabase
+      .from('versions')
+      .select('user_id')
+      .eq('id', latestVersion.parent_id)
+      .single()
+
+    if (parentVersion) {
+      const { data: parentProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', parentVersion.user_id)
+        .single()
+      parentOwner = parentProfile?.username
+    }
+  }
+
+  return { 
+    content_text: latestVersion.content_text,
+    parentOwner
+  }
+}

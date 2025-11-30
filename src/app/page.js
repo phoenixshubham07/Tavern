@@ -232,7 +232,7 @@ export default function Home() {
         </div>
 
         {/* Content Overlay */}
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full max-w-4xl p-4 pointer-events-none">
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full max-w-4xl p-4 pointer-events-none pb-32">
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse drop-shadow-2xl">HELLO, {username.toUpperCase()}</h1>
             <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>

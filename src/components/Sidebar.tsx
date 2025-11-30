@@ -16,11 +16,9 @@ export default function Sidebar({ user }: { user: any }) {
     router.refresh()
   }
 
-  const navItems = [
     { icon: <Home size={20} />, label: 'Dashboard', href: '/' },
     { icon: <PenTool size={20} />, label: 'InkFlow', href: '/inkflow' },
     { icon: <Flame size={20} />, label: 'CV Roaster', href: '/roaster' },
-    { icon: <Swords size={20} />, label: 'Duel Decks', href: '/tavern/duel' },
     { icon: <Clock size={20} />, label: 'Study Hall', href: '/tavern/room/global' },
     { icon: <Globe size={20} />, label: 'Server', href: '/server' },
     // { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },

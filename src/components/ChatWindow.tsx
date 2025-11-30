@@ -18,7 +18,7 @@ interface ChatWindowProps {
   onClose: () => void
 }
 
-export default function ChatWindow({ recipientId, recipientName, onClose, embedded = false }: ChatWindowProps & { embedded?: boolean }) {
+export default function ChatWindow({ recipientId, recipientName, onClose }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
@@ -94,32 +94,26 @@ export default function ChatWindow({ recipientId, recipientName, onClose, embedd
     }
   }
 
-  const baseClasses = embedded
-    ? "w-full h-full flex flex-col bg-transparent"
-    : "fixed bottom-4 right-4 w-80 h-96 bg-gray-900 border border-white/10 rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden"
-
   return (
-    <div className={baseClasses}>
+    <div className="fixed bottom-4 right-4 w-80 h-96 bg-gray-900 border border-white/10 rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
       {/* Header */}
-      <div className={`p-3 border-b border-white/10 flex justify-between items-center ${embedded ? 'bg-gray-900/50' : 'bg-gray-800'}`}>
+      <div className="p-3 bg-gray-800 border-b border-white/10 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
           <span className="font-bold text-white">{recipientName}</span>
         </div>
-        {!embedded && (
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
-            <X size={16} />
-          </button>
-        )}
+        <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <X size={16} />
+        </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-black/20">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-black/50">
         {messages.map((msg) => {
           const isMe = msg.sender_id === currentUserId
           return (
             <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] p-2 rounded-lg text-sm ${isMe ? 'bg-accent-blue text-navy-blue' : 'bg-gray-700 text-gray-200'}`}>
+              <div className={`max-w-[80%] p-2 rounded-lg text-sm ${isMe ? 'bg-accent-blue text-navy-blue' : 'bg-gray-800 text-gray-200'}`}>
                 {msg.content}
               </div>
             </div>
@@ -129,14 +123,14 @@ export default function ChatWindow({ recipientId, recipientName, onClose, embedd
       </div>
 
       {/* Input */}
-      <div className={`p-3 border-t border-white/10 flex gap-2 ${embedded ? 'bg-gray-900/50' : 'bg-gray-800'}`}>
+      <div className="p-3 bg-gray-800 border-t border-white/10 flex gap-2">
         <input 
           type="text" 
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Type a message..."
-          className="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent-blue"
+          className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-accent-blue"
         />
         <button 
           onClick={handleSend}

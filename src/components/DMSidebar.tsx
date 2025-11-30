@@ -99,17 +99,15 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser, embedded = fa
     }
   }, [])
 
-  const baseClasses = embedded 
-    ? "w-80 h-full bg-gray-900/50 border-r border-white/10 flex flex-col"
-    : `absolute top-0 right-0 h-full bg-gray-900 border-l border-white/10 transform transition-transform duration-300 z-50 pt-20 p-6 overflow-y-auto ${isOpen ? 'translate-x-0 w-80' : 'translate-x-full w-0'}`
-
   return (
-    <div className={baseClasses}>
-      <div className={`flex justify-between items-center mb-6 ${embedded ? 'p-6 pb-0' : ''}`}>
+    <div 
+      className={`absolute top-0 right-0 h-full bg-gray-900 border-l border-white/10 transform transition-transform duration-300 z-50 pt-20 p-6 overflow-y-auto ${isOpen ? 'translate-x-0 w-80' : 'translate-x-full w-0'}`}
+    >
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-          <MessageSquare size={20} /> Messages
+          <MessageSquare size={20} /> Direct Messages
         </h2>
-        {!embedded && onClose && (
+        {onClose && (
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             &times;
           </button>
@@ -117,9 +115,9 @@ export default function DMSidebar({ isOpen, onClose, onSelectUser, embedded = fa
       </div>
 
       {loading ? (
-        <div className="text-gray-500 text-sm p-6">Loading contacts...</div>
+        <div className="text-gray-500 text-sm">Loading contacts...</div>
       ) : (
-        <div className="space-y-2 p-4 overflow-y-auto flex-1">
+        <div className="space-y-2">
           {contacts.map((contact) => {
             const isOnline = onlineUsers.has(contact.id)
             return (

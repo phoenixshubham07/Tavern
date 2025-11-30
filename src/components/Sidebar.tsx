@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Home, PenTool, Settings, LogOut, ChevronRight, User, Flame, Swords } from 'lucide-react'
+import { Home, PenTool, Settings, LogOut, ChevronRight, User, Flame, Swords, Clock } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -21,6 +21,7 @@ export default function Sidebar({ user }: { user: any }) {
     { icon: <PenTool size={20} />, label: 'InkFlow', href: '/inkflow' },
     { icon: <Flame size={20} />, label: 'CV Roaster', href: '/roaster' },
     { icon: <Swords size={20} />, label: 'Duel Decks', href: '/tavern/duel' },
+    { icon: <Clock size={20} />, label: 'Study Hall', href: '/tavern/room/global' },
     // { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },
   ]
 

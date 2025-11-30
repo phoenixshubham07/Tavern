@@ -243,7 +243,11 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
               <p className="text-sm text-gray-300">Digitize and version control your handwritten notes.</p>
             </Link>
-            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg">
+            <Link href="/roaster" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-red-500 transition-all group shadow-lg">
+              <h3 className="text-xl font-bold mb-2 group-hover:text-red-500">🔥 CV Roaster</h3>
+              <p className="text-sm text-gray-300">Get your resume roasted by AI. Savage mode on.</p>
+            </Link>
+            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg md:col-span-2">
               <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
               <p className="text-sm text-gray-300">Complete daily challenges to earn XP.</p>
             </div>

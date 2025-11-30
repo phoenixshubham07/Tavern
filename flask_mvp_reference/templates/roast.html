@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Roaster - InkFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/discord_layout.css') }}">
+    <style>
+        /* Override/Extend Discord Layout for Roaster */
+        .discord-container {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            /* Sidebar + Content */
+            height: 100vh;
+            background-color: #202225;
+            color: white;
+            font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .roast-content {
+            background-color: #36393f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .upload-zone {
+            width: 600px;
+            height: 300px;
+            border: 3px dashed #7289da;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-zone:hover {
+            background-color: rgba(114, 137, 218, 0.1);
+            border-color: #5865f2;
+        }
+
+        .upload-zone.dragover {
+            background-color: rgba(114, 137, 218, 0.2);
+            transform: scale(1.02);
+        }
+
+        .btn-roast {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background-color: #ed4245;
+            /* Red for danger/roast */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-roast:hover {
+            background-color: #c03537;
+        }
+
+        .btn-roast:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .result-card {
+            margin-top: 30px;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .result-card img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: none;
+            margin-top: 30px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ed4245;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="discord-container">
+        <!-- Col 1: App Dock (Copied from collab.html for consistency) -->
+        <nav class="app-dock">
+            <a href="{{ url_for('collab') }}" class="dock-icon" title="Back to Chat"
+                style="text-decoration: none; color: inherit;">💬 <span class="label">Chat</span></a>
+            <div class="dock-icon" title="InkFlow Editor">✒️ <span class="label">Editor</span></div>
+            <div class="dock-icon active" title="CV Roaster">🔥 <span class="label">Roaster</span></div>
+            <div class="dock-icon" title="Scanner">📸 <span class="label">Scanner</span></div>
+            <div class="dock-icon" title="History">📜 <span class="label">History</span></div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="roast-content">
+            <h1 style="font-size: 3rem; margin-bottom: 10px;">🔥 CV Roaster 🔥</h1>
+            <p style="color: #b9bbbe; margin-bottom: 40px;">Upload your resume. Get humbled by AI.</p>
+
+            <div class="upload-zone" id="drop-zone">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📄</div>
+                <h3>Drag & Drop PDF here</h3>
+                <p style="color: #b9bbbe;">or click to browse</p>
+                <input type="file" id="file-input" accept=".pdf" style="display: none;">
+            </div>
+
+            <div id="file-name" style="margin-top: 15px; color: #7289da; font-weight: bold;"></div>
+
+            <button id="roast-btn" class="btn-roast" disabled>ROAST ME</button>
+
+            <div class="loader" id="loader"></div>
+
+            <div class="result-card" id="result-card">
+                <img id="result-img" src="" alt="Roasted CV">
+                <a id="download-link" href="#" download="inkflow-roast.png"
+                    style="display: block; text-align: center; padding: 10px; background: #5865f2; color: white; text-decoration: none; font-weight: bold;">Download
+                    Roast</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const roastBtn = document.getElementById('roast-btn');
+        const loader = document.getElementById('loader');
+        const resultCard = document.getElementById('result-card');
+        const resultImg = document.getElementById('result-img');
+        const downloadLink = document.getElementById('download-link');
+
+        let selectedFile = null;
+
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a PDF file!');
+                return;
+            }
+            selectedFile = file;
+            fileNameDisplay.textContent = `Selected: ${file.name}`;
+            roastBtn.disabled = false;
+            resultCard.style.display = 'none';
+        }
+
+        // Roast Action
+        roastBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // UI Updates
+            roastBtn.disabled = true;
+            roastBtn.textContent = "Roasting...";
+            loader.style.display = 'block';
+            resultCard.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+
+            try {
+                const response = await fetch('/roast_cv', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Success
+                    resultImg.src = `data:image/png;base64,${data.image}`;
+                    downloadLink.href = `data:image/png;base64,${data.image}`;
+                    resultCard.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. The AI might be too stunned by your resume.');
+            } finally {
+                loader.style.display = 'none';
+                roastBtn.disabled = false;
+                roastBtn.textContent = "ROAST ME";
+            }
+        });
+    </script>
+</body>
+
+</html>

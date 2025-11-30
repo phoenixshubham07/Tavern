@@ -1,14 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
-from models import db, User, Note, Server, Channel
-from flask_login import current_user, login_required, LoginManager, login_user, logout_user
-from flask_socketio import SocketIO
+
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
+from models import User, Note, Server, Channel
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import current_user, login_required, LoginManager, login_user, logout_user, UserMixin
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from events import register_events
+import eventlet
+import os
+from utils.roaster import process_cv
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inkflow.db'
-app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['SECRET_KEY'] = 'secret!'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 

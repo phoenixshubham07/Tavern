@@ -93,25 +93,16 @@ export async function generateDeck(matchId: string, year: string, stream: string
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
     
     const prompt = `
-    Generate 3 DIFFICULT flashcards for a ${year} ${stream} student.
-    
-    For each flashcard, generate:
-    1. A Concept (e.g., "Mitochondria")
-    2. A Trick Question (e.g., "Powerhouse of the cell?")
-    3. 4 Options (1 correct, 3 distractors)
-    4. The Correct Answer (must match one of the options exactly)
-    5. A simple, single-word or two-word SEARCH KEYWORD for an image representing the concept (e.g., "mitochondria", "cell", "dna").
-    
-    Output ONLY JSON:
+    Create 3 hard flashcards for ${year} ${stream}.
+    JSON format:
     [
       {
-        "concept": "...",
-        "question": "...",
-        "options": ["A", "B", "C", "D"],
-        "answer": "A",
-        "image_keyword": "..."
-      },
-      ...
+        "concept": "Short Concept Name",
+        "question": "Tricky question?",
+        "options": ["Correct", "Wrong1", "Wrong2", "Wrong3"],
+        "answer": "Correct",
+        "image_keyword": "search_term"
+      }
     ]
     `
 

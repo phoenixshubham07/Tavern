@@ -2,6 +2,7 @@ import { getSharedNote, remixNote } from '@/app/inkflow/actions';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Copy, ArrowLeft } from 'lucide-react';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function SharedNotePage({ params }: { params: { token: string } }) {
   const { token } = await params;
@@ -30,6 +31,9 @@ export default async function SharedNotePage({ params }: { params: { token: stri
     }
   }
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen bg-black text-white font-mono p-6 md:p-12">
       <div className="max-w-3xl mx-auto">
@@ -49,15 +53,25 @@ export default async function SharedNotePage({ params }: { params: { token: stri
             </div>
           </div>
           
-          <form action={handleRemix}>
-            <button 
-              type="submit"
-              className="flex items-center gap-2 px-6 py-3 bg-accent-blue text-navy-blue rounded-lg font-bold hover:bg-white transition-all"
+          {user ? (
+            <form action={handleRemix}>
+              <button 
+                type="submit"
+                className="flex items-center gap-2 px-6 py-3 bg-accent-blue text-navy-blue rounded-lg font-bold hover:bg-white transition-all"
+              >
+                <Copy size={18} />
+                Remix this Note
+              </button>
+            </form>
+          ) : (
+            <Link 
+              href={`/login?next=/share/${token}`}
+              className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg font-bold hover:bg-white/20 transition-all"
             >
               <Copy size={18} />
-              Remix this Note
-            </button>
-          </form>
+              Login to Remix
+            </Link>
+          )}
         </div>
 
         {/* Note Content */}

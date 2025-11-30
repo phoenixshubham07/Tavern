@@ -317,35 +317,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="w-full py-32 relative overflow-hidden">
-        <div className="max-w-full">
-          <div className="text-center mb-24 px-4">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">Elevate Your Learning</h2>
-            <p className="text-gray-400 text-xl max-w-2xl mx-auto">Everything you need to excel, wrapped in a beautiful, distraction-free interface.</p>
-          </div>
-
-          <div ref={featuresRef} className="space-y-12">
-            {/* Row 1: Right to Left */}
-            <div className="relative flex overflow-hidden group">
-              <div className="flex gap-8 animate-marquee-left pause-on-hover whitespace-nowrap">
-                {[...topFeatures, ...topFeatures, ...topFeatures, ...topFeatures].map((feature, i) => (
-                  <FeatureCard key={`top-${i}`} {...feature} />
-                ))}
-              </div>
-            </div>
-
-            {/* Row 2: Left to Right */}
-            <div className="relative flex overflow-hidden group">
-              <div className="flex gap-8 animate-marquee-right pause-on-hover whitespace-nowrap">
-                {[...bottomFeatures, ...bottomFeatures, ...bottomFeatures, ...bottomFeatures].map((feature, i) => (
-                  <FeatureCard key={`bottom-${i}`} {...feature} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Features Section Removed */}
 
       {/* Call to Action */}
       <section ref={ctaRef} className="w-full min-h-screen py-32 px-4 relative flex flex-col items-center justify-center overflow-hidden">
@@ -372,24 +344,4 @@ export default function Home() {
   );
 }
 
-function FeatureCard({ icon, title, description }) {
-  const CardContent = (
-    <div className="feature-card min-w-[350px] p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent-blue/30 transition-all duration-500 group cursor-default hover:-translate-y-2 will-change-transform">
-      <div className="mb-6 p-4 bg-white/5 rounded-2xl w-fit group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-        {icon}
-      </div>
-      <h3 className="text-2xl font-bold mb-4 group-hover:text-accent-blue transition-colors">{title}</h3>
-      <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{description}</p>
-    </div>
-  );
 
-  if (title === "InkFlow") {
-    return (
-      <Link href="/inkflow">
-        {CardContent}
-      </Link>
-    );
-  }
-
-  return CardContent;
-}

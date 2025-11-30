@@ -147,22 +147,32 @@ export default function Home() {
 
   if (loading) return <div className="bg-black h-screen w-full flex items-center justify-center text-white font-mono">LOADING...</div>;
 
-  const onSplineLoad = (spline) => {
-    // Aggressive hack: Hide all non-canvas elements in the container
-    // This removes the "Move your mouse" hint and the Spline logo if they are HTML overlays
-    setTimeout(() => {
-      const canvas = spline.canvas;
-      if (canvas && canvas.parentElement) {
-        const children = canvas.parentElement.children;
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i];
-          if (child.tagName !== 'CANVAS') {
-            child.style.display = 'none';
-          }
+  useEffect(() => {
+    // Global hack to remove Spline hint text
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length) {
+          const hints = document.querySelectorAll('div');
+          hints.forEach(el => {
+            if (el.textContent === 'Move your mouse to look around' ||
+              el.textContent === 'Drag to rotate' ||
+              el.textContent.includes('Move your mouse')) {
+              el.style.display = 'none';
+              el.style.opacity = '0';
+              el.style.pointerEvents = 'none';
+            }
+          });
         }
       }
-    }, 1000);
-  };
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   if (username) {
     return (
@@ -172,7 +182,6 @@ export default function Home() {
         <div className="absolute inset-0 z-0 opacity-80">
           <Spline
             scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
-            onLoad={onSplineLoad}
           />
         </div>
 

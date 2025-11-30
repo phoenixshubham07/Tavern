@@ -10,7 +10,7 @@ type Flashcard = {
   question: string
   options: string[]
   answer: string
-  svg: string
+  image_url: string
 }
 
 type MatchState = {
@@ -102,8 +102,8 @@ export default function Arena({ matchId }: { matchId: string }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <Loader2 className="w-16 h-16 animate-spin text-purple-500" />
-        <h2 className="text-2xl font-bold animate-pulse">Generating Battle Deck...</h2>
-        <p className="text-gray-400">AI is drawing diagrams and crafting trick questions.</p>
+        <h2 className="text-2xl font-bold animate-pulse">Summoning Battle Deck...</h2>
+        <p className="text-gray-400">AI is crafting trick questions and fetching artifacts.</p>
       </div>
     )
   }
@@ -160,12 +160,13 @@ export default function Arena({ matchId }: { matchId: string }) {
         <div 
           className="aspect-video bg-black rounded-2xl overflow-hidden border-2 border-white/10 shadow-2xl relative group"
         >
-           <div 
-             className="w-full h-full"
-             dangerouslySetInnerHTML={{ __html: currentCard.svg }}
+           <img 
+             src={currentCard.image_url} 
+             alt={currentCard.concept}
+             className="w-full h-full object-cover"
            />
            <div className="absolute top-4 right-4 bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10">
-             <span className="font-mono text-xs text-gray-300">AI GENERATED</span>
+             <span className="font-mono text-xs text-gray-300">WEB IMAGE</span>
            </div>
         </div>
 

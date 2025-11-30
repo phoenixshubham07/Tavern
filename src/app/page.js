@@ -158,11 +158,17 @@ export default function Home() {
             <Spline
               scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
               onLoad={(spline) => {
-                const namesToHide = ['Text', 'Hint', 'Mouse', 'Cursor', 'Instruction'];
+                // Try to hide the "Move your mouse" text and background objects
+                const namesToHide = [
+                  'Text', 'Hint', 'Mouse', 'Cursor', 'Instruction',
+                  'Background', 'Backdrop', 'Floor', 'Plane', 'Ground', 'Rect'
+                ];
                 namesToHide.forEach(name => {
                   const obj = spline.findObjectByName(name);
                   if (obj) obj.visible = false;
                 });
+                // Attempt to set background to transparent if the API allows
+                // spline.setSplineColor('transparent'); // This might not work directly
               }}
             />
           </div>

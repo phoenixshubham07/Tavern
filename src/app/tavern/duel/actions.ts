@@ -65,8 +65,8 @@ export async function findMatch(year: string, stream: string) {
     // 3. Remove opponent from queue
     await supabase.from('duel_queue').delete().eq('id', opponent.id)
 
-    // 4. Trigger Deck Generation (Async - don't await)
-    generateDeck(match.id, year, stream)
+    // 4. Trigger Deck Generation (Await to ensure it runs)
+    await generateDeck(match.id, year, stream)
 
     return { matchId: match.id }
   } else {

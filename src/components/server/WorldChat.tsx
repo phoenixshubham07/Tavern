@@ -77,11 +77,19 @@ export default function WorldChat() {
     }
 
     // Optimistic UI
-    // setMessages(prev => [...prev, { ...msg, id: Date.now(), created_at: new Date().toISOString() }])
+    const tempId = Date.now()
+    setMessages(prev => [...prev, { ...msg, id: tempId, created_at: new Date().toISOString() }])
     setNewMessage('')
     scrollToBottom()
 
-    await supabase.from('world_chat').insert(msg)
+    const { error } = await supabase.from('world_chat').insert(msg)
+    
+    if (error) {
+      console.error('Error sending message:', error)
+      // Rollback optimistic update if failed
+      setMessages(prev => prev.filter(m => m.id !== tempId))
+      alert('Failed to send message. Please try again.')
+    }
   }
 
   return (

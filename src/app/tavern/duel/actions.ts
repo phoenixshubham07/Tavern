@@ -90,7 +90,7 @@ export async function generateDeck(matchId: string, year: string, stream: string
   const supabase = await createClient()
   
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
     
     const prompt = `
     Generate 3 DIFFICULT flashcards for a ${year} ${stream} student.
@@ -120,7 +120,16 @@ export async function generateDeck(matchId: string, year: string, stream: string
 
     const result = await model.generateContent(prompt)
     const response = await result.response
-    const text = response.text().replace(/```json/g, '').replace(/```/g, '')
+    let text = response.text()
+    
+    // Robust JSON extraction
+    const jsonStart = text.indexOf('[')
+    const jsonEnd = text.lastIndexOf(']')
+    
+    if (jsonStart !== -1 && jsonEnd !== -1) {
+      text = text.substring(jsonStart, jsonEnd + 1)
+    }
+
     const deck: Flashcard[] = JSON.parse(text)
 
     // Update Match
@@ -137,7 +146,7 @@ export async function generateDeck(matchId: string, year: string, stream: string
     // Set status to error so client knows to stop loading
     await supabase
       .from('duel_matches')
-      .update({ status: 'error' }) // Ensure 'error' is handled in UI or just use 'finished' with 0 score
+      .update({ status: 'error' }) 
       .eq('id', matchId)
   }
 }

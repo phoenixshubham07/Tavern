@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tavern Collaboration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/discord_layout.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+    <div class="discord-container">
+        <!-- Col 1: App Dock -->
+        <nav class="app-dock">
+            <div class="dock-icon" title="InkFlow Editor">✒️ <span class="label">Editor</span></div>
+            <div class="dock-icon" title="Scanner">📸 <span class="label">Scanner</span></div>
+            <div class="dock-icon" title="History">📜 <span class="label">History</span></div>
+        </nav>
+
+        <!-- Col 2: Server List -->
+        <nav class="server-list">
+            {% for server in servers %}
+            <div class="server-icon" data-id="{{ server.id }}" title="{{ server.name }}">
+                {{ server.name[:2].upper() }}
+            </div>
+            {% endfor %}
+            <div class="server-icon add-server">+</div>
+        </nav>
+
+        <!-- Col 3: Chat/Stage -->
+        <main class="chat-stage">
+            <header class="chat-header">
+                <h3># general</h3>
+                <div class="header-actions">
+                    <button id="join-voice-btn">Join Voice</button>
+                </div>
+            </header>
+
+            <div class="messages-area" id="messages-area">
+                <!-- Messages will appear here -->
+                <div class="message system">Welcome to Tavern!</div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="Message #general">
+            </div>
+        </main>
+
+        <!-- Col 4: Roster -->
+        <aside class="roster">
+            <div class="roster-header">ONLINE — 1</div>
+            <div class="user-item">
+                <div class="avatar"></div>
+                <div class="user-info">
+                    <div class="username">{{ current_user.username }}</div>
+                    <div class="status">Online</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Hidden data for JS -->
+    <input type="hidden" id="current-user-id" value="{{ current_user.id }}">
+    <input type="hidden" id="current-username" value="{{ current_user.username }}">
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+
+</html>

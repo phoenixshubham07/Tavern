@@ -262,3 +262,57 @@ export async function getLatestVersionMetadata() {
     parentOwner
   }
 }
+
+export async function getContacts() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return []
+
+  // For MVP, just fetch all profiles except current user
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, username')
+    .neq('id', user.id)
+    .limit(20)
+
+  return profiles || []
+}
+
+export async function sendDirectMessage(content: string, recipientId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('direct_messages')
+    .insert({
+      content,
+      sender_id: user.id,
+      recipient_id: recipientId
+    })
+
+  if (error) {
+    console.error('Send DM Error:', error)
+    return { error: 'Failed to send message' }
+  }
+
+  return { success: true }
+}
+
+export async function getDirectMessages(recipientId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return []
+
+  const { data } = await supabase
+    .from('direct_messages')
+    .select('*')
+    .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
+    .order('created_at', { ascending: true })
+    .limit(50)
+
+  return data || []
+}

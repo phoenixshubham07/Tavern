@@ -148,21 +148,18 @@ export default function Home() {
   if (loading) return <div className="bg-black h-screen w-full flex items-center justify-center text-white font-mono">LOADING...</div>;
 
   const onSplineLoad = (spline) => {
-    // Hack to remove the "Move your mouse" hint
-    // We wait a bit for the hint to appear, then try to find it
+    // Aggressive hack: Hide all non-canvas elements in the container
+    // This removes the "Move your mouse" hint and the Spline logo if they are HTML overlays
     setTimeout(() => {
-      const splineContainer = spline.canvas.parentElement;
-      if (splineContainer) {
-        // Try to find the hint element by its content or structure
-        // Usually it's a div with text "Move your mouse"
-        const elements = splineContainer.querySelectorAll('div');
-        elements.forEach(el => {
-          if (el.textContent.includes('Move your mouse') || el.textContent.includes('Drag to rotate')) {
-            el.style.display = 'none';
+      const canvas = spline.canvas;
+      if (canvas && canvas.parentElement) {
+        const children = canvas.parentElement.children;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (child.tagName !== 'CANVAS') {
+            child.style.display = 'none';
           }
-        });
-
-        // Also try to target shadow dom if it exists (though react-spline usually doesn't use it like the web component)
+        }
       }
     }, 1000);
   };

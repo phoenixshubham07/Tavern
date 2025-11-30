@@ -40,20 +40,19 @@ export default function InkFlowPage() {
   async function handleShare() {
     // First save current state
     const saveResult = await saveVersion(markdown, null)
-    if (saveResult.error) {
+    if (saveResult.error || !saveResult.id) {
       alert('Please save your note before sharing.')
       return
     }
     
-    // Then share
-    await loadHistory()
-    const latest = await getHistory()
-    if (latest && latest.length > 0) {
-       const shareResult = await shareNote(latest[0].id)
-       if (shareResult.success && shareResult.token) {
-         const origin = typeof window !== 'undefined' ? window.location.origin : ''
-         setShareUrl(origin + '/share/' + shareResult.token)
-       }
+    // Then share using the ID we just got
+    const shareResult = await shareNote(saveResult.id)
+    
+    if (shareResult.success && shareResult.token) {
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+      setShareUrl(origin + '/share/' + shareResult.token)
+      // Refresh history list to show the new version
+      await loadHistory()
     }
   }
 

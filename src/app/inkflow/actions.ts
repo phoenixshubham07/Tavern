@@ -62,7 +62,7 @@ export async function saveVersion(content: string, originalImageBase64: string |
   const nextVersionNumber = (latestVersion?.version_number || 0) + 1
 
   // 2. Insert new version
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('versions')
     .insert({
       user_id: user.id,
@@ -74,14 +74,16 @@ export async function saveVersion(content: string, originalImageBase64: string |
       // or just save it if it's small. Let's just save the text for now.
       original_image_path: 'uploaded-via-inkflow', 
     })
+    .select('id')
+    .single()
 
-  if (error) {
+  if (error || !data) {
     console.error('Save Error:', error)
     return { error: 'Failed to save version' }
   }
 
   revalidatePath('/inkflow')
-  return { success: true, version: nextVersionNumber }
+  return { success: true, version: nextVersionNumber, id: data.id }
 }
 
 export async function getHistory() {

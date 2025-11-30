@@ -238,24 +238,7 @@ export default function Home() {
             <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 pointer-events-auto">
-            <Link href="/inkflow" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-accent-blue transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
-              <p className="text-sm text-gray-300">Digitize and version control your handwritten notes.</p>
-            </Link>
-            <Link href="/roaster" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-red-500 transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-red-500">🔥 CV Roaster</h3>
-              <p className="text-sm text-gray-300">Get your resume roasted by AI. Savage mode on.</p>
-            </Link>
-            <Link href="/tavern/duel" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-purple-500 transition-all group shadow-lg">
-              <h3 className="text-xl font-bold mb-2 group-hover:text-purple-500">⚔️ Duel Decks</h3>
-              <p className="text-sm text-gray-300">Challenge friends to AI-powered flashcard battles.</p>
-            </Link>
-            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg md:col-span-2">
-              <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
-              <p className="text-sm text-gray-300">Complete daily challenges to earn XP.</p>
-            </div>
-          </div>
+          {/* Feature Cards Removed - Use Sidebar for Navigation */}
         </div>
       </div>
     );

@@ -62,6 +62,54 @@ export default function Home() {
   const ctaRef = useRef(null);
 
   useEffect(() => {
+    // Global hack to remove Spline hint text and logo
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length) {
+          // Target specific text content
+          const hints = document.querySelectorAll('div');
+          hints.forEach(el => {
+            const text = el.textContent?.toLowerCase() || '';
+            if (text.includes('move your mouse') ||
+              text.includes('drag to rotate') ||
+              text.includes('look around')) {
+              el.style.display = 'none';
+              el.style.opacity = '0';
+              el.style.pointerEvents = 'none';
+            }
+          });
+
+          // Target Spline logo/watermark by common attributes if possible
+          const logos = document.querySelectorAll('a[href*="spline.design"]');
+          logos.forEach(el => {
+            el.style.display = 'none';
+          });
+        }
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // CSS Injection Backup
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* Hide Spline UI overlays */
+      #spline-watermark, .spline-watermark { display: none !important; }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      observer.disconnect();
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const checkUser = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();

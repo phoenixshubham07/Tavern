@@ -147,47 +147,54 @@ export default function Home() {
 
   if (loading) return <div className="bg-black h-screen w-full flex items-center justify-center text-white font-mono">LOADING...</div>;
 
+  const onSplineLoad = (spline) => {
+    // Hack to remove the "Move your mouse" hint
+    // We wait a bit for the hint to appear, then try to find it
+    setTimeout(() => {
+      const splineContainer = spline.canvas.parentElement;
+      if (splineContainer) {
+        // Try to find the hint element by its content or structure
+        // Usually it's a div with text "Move your mouse"
+        const elements = splineContainer.querySelectorAll('div');
+        elements.forEach(el => {
+          if (el.textContent.includes('Move your mouse') || el.textContent.includes('Drag to rotate')) {
+            el.style.display = 'none';
+          }
+        });
+
+        // Also try to target shadow dom if it exists (though react-spline usually doesn't use it like the web component)
+      }
+    }, 1000);
+  };
+
   if (username) {
     return (
-      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono space-y-8">
+      <div className="min-h-screen w-full bg-black text-white flex flex-col items-center justify-center font-mono relative overflow-hidden">
 
-        {/* Hero Section with Spline Background */}
-        <div className="relative w-full max-w-4xl h-[400px] flex items-center justify-center">
-          {/* Spline Scene (Background) */}
-          <div className="absolute inset-0 z-0">
-            <Spline
-              scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
-              onLoad={(spline) => {
-                // Try to hide the "Move your mouse" text and background objects
-                const namesToHide = [
-                  'Text', 'Hint', 'Mouse', 'Cursor', 'Instruction',
-                  'Background', 'Backdrop', 'Floor', 'Plane', 'Ground', 'Rect'
-                ];
-                namesToHide.forEach(name => {
-                  const obj = spline.findObjectByName(name);
-                  if (obj) obj.visible = false;
-                });
-                // Attempt to set background to transparent if the API allows
-                // spline.setSplineColor('transparent'); // This might not work directly
-              }}
-            />
-          </div>
+        {/* Spline 3D Scene Background */}
+        <div className="absolute inset-0 z-0 opacity-80">
+          <Spline
+            scene="https://prod.spline.design/SDdGLD2c7uADKNPj/scene.splinecode"
+            onLoad={onSplineLoad}
+          />
+        </div>
 
-          {/* Username Text (Foreground) */}
-          <div className="text-center space-y-4 z-10 pointer-events-none">
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full max-w-4xl p-4 pointer-events-none">
+          <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-pulse drop-shadow-2xl">HELLO, {username.toUpperCase()}</h1>
             <p className="text-gray-300 drop-shadow-md font-bold">WELCOME TO THE TAVERN</p>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl px-4 z-10">
-          <Link href="/inkflow" className="p-6 border border-white/10 rounded-xl hover:bg-white/5 transition-all group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
-            <p className="text-sm text-gray-400">Digitize and version control your handwritten notes.</p>
-          </Link>
-          <div className="p-6 border border-white/10 rounded-xl hover:bg-white/5 transition-all group cursor-not-allowed opacity-50">
-            <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
-            <p className="text-sm text-gray-400">Complete daily challenges to earn XP.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full px-4 pointer-events-auto">
+            <Link href="/inkflow" className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 hover:border-accent-blue transition-all group shadow-lg">
+              <h3 className="text-xl font-bold mb-2 group-hover:text-accent-blue">✒️ InkFlow</h3>
+              <p className="text-sm text-gray-300">Digitize and version control your handwritten notes.</p>
+            </Link>
+            <div className="p-6 border border-white/20 bg-black/40 backdrop-blur-md rounded-xl hover:bg-white/10 transition-all group cursor-not-allowed opacity-50 shadow-lg">
+              <h3 className="text-xl font-bold mb-2">⚔️ Quests (Coming Soon)</h3>
+              <p className="text-sm text-gray-300">Complete daily challenges to earn XP.</p>
+            </div>
           </div>
         </div>
       </div>
